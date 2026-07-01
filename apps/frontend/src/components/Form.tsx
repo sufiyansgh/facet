@@ -4,7 +4,7 @@ import { Input } from "../components/ui/input";
 import { toast } from "sonner";
 import axios from "axios";
 import { BACKEND_URL } from "@/lib/config";
-import { useNavigate } from "react-router";
+import { useNavigate } from "react-router-dom";
 import { ArrowRight, Github, Loader2, Mic } from "lucide-react";
 
 export function Form() {

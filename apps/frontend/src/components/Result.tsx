@@ -1,7 +1,7 @@
 import { BACKEND_URL } from "@/lib/config";
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router";
+import { useNavigate, useParams } from "react-router-dom";
 import { Bot, Loader2, Sparkles, User } from "lucide-react";
 import { Button } from "./ui/button";
 import { cn } from "@/lib/utils";
