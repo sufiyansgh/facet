@@ -1,159 +1,127 @@
-# Turborepo starter
+# Facet
 
-This Turborepo starter is maintained by the Turborepo core team.
+Facet is a voice-first AI interview experience that helps users practice technical interviews in real time. Users enter a GitHub profile, begin a live interview session, and receive AI-generated feedback and a score at the end.
 
-## Using this example
+## What it does
 
-Run the following command:
+- Collects a GitHub profile URL from the user
+- Starts a live interview flow with microphone access
+- Records user speech and stores conversation messages
+- Generates interview feedback and a score using Gemini
+- Shows the final transcript and evaluation on a results page
 
-```sh
-npx create-turbo@latest
+## Tech stack
+
+- Frontend: React, TypeScript, Tailwind, shadcn-style UI
+- Backend: Express, TypeScript, Prisma, PostgreSQL
+- AI: Gemini for result evaluation
+- Real-time: OpenAI and WebRTC-style interview flow with microphone input 
+
+## Project structure
+
+```text
+apps/
+  frontend/   # React app for the interview experience
+  backend/    # Express API and Prisma models
+packages/     # Shared UI/config packages
 ```
 
-## What's inside?
+## Prerequisites
 
-This Turborepo includes the following packages/apps:
+- Node.js 18+
+- Bun 1.3+
+- PostgreSQL database
 
-### Apps and Packages
+## Installation
 
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
+From the repository root:
 
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
-
-### Utilities
-
-This Turborepo has some additional tools already setup for you:
-
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
-
-### Build
-
-To build all apps and packages, run the following command:
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
-
-```sh
-cd my-turborepo
-turbo build
+```bash
+bun install
 ```
 
-Without global `turbo`, use your package manager:
+## Environment variables
 
-```sh
-cd my-turborepo
-npx turbo build
-bun dlx turbo build
-bun exec turbo build
+### Backend
+
+In [apps/backend](apps/backend), set:
+
+```bash
+DATABASE_URL=postgresql://...
+GEMINI_API_KEY=your-gemini-api-key
 ```
 
-You can build a specific package by using a [filter](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters):
+### Frontend
 
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
+In [apps/frontend](apps/frontend), set:
 
-```sh
-turbo build --filter=docs
+```bash
+VITE_BACKEND_URL=http://localhost:3001
 ```
 
-Without global `turbo`:
+## Database setup
 
-```sh
-npx turbo build --filter=docs
-bun exec turbo build --filter=docs
-bun exec turbo build --filter=docs
+Run Prisma migrations:
+
+```bash
+cd apps/backend
+bunx prisma migrate dev
 ```
 
-### Develop
+Generate the Prisma client:
 
-To develop all apps and packages, run the following command:
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
-
-```sh
-cd my-turborepo
-turbo dev
+```bash
+bunx prisma generate
 ```
 
-Without global `turbo`, use your package manager:
+## Running locally
 
-```sh
-cd my-turborepo
-npx turbo dev
-bun exec turbo dev
-bun exec turbo dev
+Start the backend:
+
+```bash
+cd apps/backend
+bun run dev
 ```
 
-You can develop a specific package by using a [filter](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters):
+Start the frontend:
 
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
-
-```sh
-turbo dev --filter=web
+```bash
+cd apps/frontend
+bun run dev
 ```
 
-Without global `turbo`:
+Then open the frontend in your browser.
 
-```sh
-npx turbo dev --filter=web
-bun exec turbo dev --filter=web
-bun exec turbo dev --filter=web
-```
+## API overview
 
-### Remote Caching
+### Pre-interview
 
-> [!TIP]
-> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
+- POST /api/v1/pre-interview
+- Creates a new interview record from a GitHub profile URL
 
-Turborepo can use a technique known as [Remote Caching](https://turborepo.dev/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
+### Session
 
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
+- POST /api/v1/session/:interviewId
+- Starts the interview session flow
 
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
+### Messages
 
-```sh
-cd my-turborepo
-turbo login
-```
+- POST /api/v1/session/user/response/:interviewId
+- Saves a user transcript message
 
-Without global `turbo`, use your package manager:
+### Result
 
-```sh
-cd my-turborepo
-npx turbo login
-bun exec turbo login
-bun exec turbo login
-```
+- GET /api/v1/result/:interviewId
+- Returns score, feedback, and transcript
 
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
+## Deployment notes
 
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
+The current app is structured for a split deployment:
 
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
+- Frontend: deploy on Vercel
+- Backend: deploy on a server host such as Railway, Render, or Fly.io
+- Database: use PostgreSQL-compatible hosting such as Neon or Supabase
 
-```sh
-turbo link
-```
+## Notes
 
-Without global `turbo`:
-
-```sh
-npx turbo link
-bun exec turbo link
-bun exec turbo link
-```
-
-## Useful Links
-
-Learn more about the power of Turborepo:
-
-- [Tasks](https://turborepo.dev/docs/crafting-your-repository/running-tasks)
-- [Caching](https://turborepo.dev/docs/crafting-your-repository/caching)
-- [Remote Caching](https://turborepo.dev/docs/core-concepts/remote-caching)
-- [Filtering](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters)
-- [Configuration Options](https://turborepo.dev/docs/reference/configuration)
-- [CLI Usage](https://turborepo.dev/docs/reference/command-line-reference)
+This project is still evolving, and some parts of the realtime interview flow may depend on external credentials and services. The core experience is designed to be simple, fast, and easy to extend.
