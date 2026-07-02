@@ -82,7 +82,7 @@ export function Interview() {
             const socket = new WebSocket("wss://api.deepgram.com/v1/listen", [
                 "token",
                 //TODO: Lets create ephemereal api keys for the user and not put the prod key on the frontend
-                "3cc237ac4bc2307a82a13294e782f7b836ad17b2",
+                "",
             ]);
             socketRef.current = socket;
 
